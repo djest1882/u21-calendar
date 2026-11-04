@@ -1,0 +1,43 @@
+name: Update U21 calendar
+
+on:
+  schedule:
+    # Every 6 hours (UTC)
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["build_calendar.py", ".github/workflows/update-calendar.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-calendar
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build calendar
+        run: python build_calendar.py docs/u21-england.ics
+
+      - name: Commit if fixtures changed
+        run: |
+          # Ignore the DTSTAMP lines, which change on every run
+          if git diff --quiet -I '^DTSTAMP:' -- docs/u21-england.ics && git ls-files --error-unmatch docs/u21-england.ics >/dev/null 2>&1; then
+            echo "No fixture changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add docs/u21-england.ics
+          git commit -m "Update U21 fixtures $(date -u +'%Y-%m-%d %H:%M')"
+          git push

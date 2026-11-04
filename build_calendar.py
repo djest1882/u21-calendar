@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build an iCalendar (.ics) feed of U21 club games played in England.
+Build an iCalendar (.ics) feed of U21 club games in English competitions.
 
 Source: the Premier League's own match API (the same data that powers
 premierleague.com/en/matches/u21). Competitions covered:
@@ -12,7 +12,6 @@ premierleague.com/en/matches/u21). Competitions covered:
   EFLT EFL Trophy - U21 sides' games only   (7)
   NLC  National League Cup - U21 sides only (1275)
 
-Games at Welsh venues (e.g. Cardiff, Swansea in the PDL) are left out.
 Usage:  python build_calendar.py [output.ics] [--from-json file.json]
 """
 import json
@@ -37,17 +36,6 @@ COMPETITIONS = {
 # Competitions that also contain first-team-only games: keep only U21 games.
 U21_ONLY = {"7", "1275"}
 LEAGUES = {"898", "665"}
-
-# Venues outside England (last part of the ground string, lower-case).
-NON_ENGLAND_PLACES = {
-    "cardiff", "leckwith", "swansea", "newport", "wrexham", "llanelli",
-    "bridgend", "merthyr tydfil", "neath", "port talbot", "barry",
-    "pontypridd", "aberystwyth", "bangor", "rhyl", "colwyn bay",
-    "glasgow", "edinburgh", "belfast", "dublin",
-}
-# Fallback when a venue is missing: home clubs based outside England.
-NON_ENGLAND_CLUBS = ("cardiff city", "swansea city", "newport county", "wrexham")
-
 
 def season_start_year(today=None):
     today = today or datetime.now(LONDON).date()
@@ -90,21 +78,13 @@ def is_u21_game(m):
     return "U21" in names or "U23" in names
 
 
-def in_england(m):
-    ground = (m.get("ground") or "").strip()
-    if ground:
-        place = ground.split(",")[-1].strip().lower()
-        return place not in NON_ENGLAND_PLACES
-    return not m["homeTeam"]["name"].lower().startswith(NON_ENGLAND_CLUBS)
-
-
 def keep(m):
     comp = str(m.get("competitionId"))
     if comp not in COMPETITIONS:
         return False
     if comp in U21_ONLY and not is_u21_game(m):
         return False
-    return in_england(m)
+    return True
 
 
 # ---------- iCalendar helpers ----------
@@ -201,12 +181,12 @@ def build_calendar(matches):
     seen, lines = set(), [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//U21 Fixtures//England U21 club games//EN",
+        "PRODID:-//U21 Fixtures//U21 club games//EN",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
-        "X-WR-CALNAME:U21 Football in England",
+        "X-WR-CALNAME:U21 Football",
         "X-WR-CALDESC:PL2\\, PDL\\, PL Cup\\, PL International Cup\\, EFL Trophy and "
-        "National League Cup games involving U21 sides\\, at venues in England. "
+        "National League Cup games involving U21 sides. "
         "Source: premierleague.com. Updated daily.",
         "X-WR-TIMEZONE:Europe/London",
         "REFRESH-INTERVAL;VALUE=DURATION:PT6H",
@@ -224,7 +204,7 @@ def build_calendar(matches):
 
 def main():
     args = sys.argv[1:]
-    out = "docs/u21-england.ics"
+    out = "docs/u21-fixtures.ics"
     src = None
     if "--from-json" in args:
         i = args.index("--from-json")

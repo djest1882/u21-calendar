@@ -27,17 +27,17 @@ jobs:
           python-version: "3.12"
 
       - name: Build calendar
-        run: python build_calendar.py docs/u21-england.ics
+        run: python build_calendar.py docs/u21-fixtures.ics
 
       - name: Commit if fixtures changed
         run: |
           # Ignore the DTSTAMP lines, which change on every run
-          if git diff --quiet -I '^DTSTAMP:' -- docs/u21-england.ics && git ls-files --error-unmatch docs/u21-england.ics >/dev/null 2>&1; then
+          if git diff --quiet -I '^DTSTAMP:' -- docs/u21-fixtures.ics && git ls-files --error-unmatch docs/u21-fixtures.ics >/dev/null 2>&1; then
             echo "No fixture changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
-          git add docs/u21-england.ics
+          git add docs/u21-fixtures.ics
           git commit -m "Update U21 fixtures $(date -u +'%Y-%m-%d %H:%M')"
           git push

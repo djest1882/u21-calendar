@@ -1,6 +1,6 @@
-# U21 Football in England — calendar feed
+# U21 Football — calendar feed
 
-A subscribable calendar of every game involving U21 sides, played at venues in England, in:
+A subscribable calendar of every game involving U21 sides in:
 
 | Code | Competition |
 |---|---|
@@ -11,11 +11,9 @@ A subscribable calendar of every game involving U21 sides, played at venues in E
 | EFL Trophy | EFL Trophy (only ties involving a U21 side) |
 | NL Cup | National League Cup (only ties involving a U21 side) |
 
-Games at Welsh venues (Cardiff, Swansea etc. in the PDL) are left out.
-
 ## How it works
 
-`build_calendar.py` pulls fixtures from the Premier League's own match data (the source behind premierleague.com/en/matches/u21) and writes `docs/u21-england.ics`. A GitHub Action re-runs it every 6 hours and commits the file only when a fixture changes, so date moves, kick-off changes, postponements and new cup draws flow through automatically. Each match keeps the same ID, so your calendar app updates the existing event rather than adding a duplicate.
+`build_calendar.py` pulls fixtures from the Premier League's own match data (the source behind premierleague.com/en/matches/u21) and writes `docs/u21-fixtures.ics`. A GitHub Action re-runs it every 6 hours and commits the file only when a fixture changes, so date moves, kick-off changes, postponements and new cup draws flow through automatically. Each match keeps the same ID, so your calendar app updates the existing event rather than adding a duplicate.
 
 - Finished games show the score in the title, e.g. `Bristol Rovers 2-2 (2-4 pens) Chelsea U21 (EFL Trophy)`.
 - Postponed games are titled `POSTPONED:` until a new date is set.
@@ -23,7 +21,7 @@ Games at Welsh venues (Cardiff, Swansea etc. in the PDL) are left out.
 
 ## Subscribe
 
-Use the raw file link: `https://raw.githubusercontent.com/<you>/<repo>/main/docs/u21-england.ics`
+Use the raw file link: `https://raw.githubusercontent.com/<you>/<repo>/main/docs/u21-fixtures.ics`
 
 - **Google Calendar** (computer): Other calendars → **+** → **From URL** → paste the link.
 - **Apple Calendar**: File → **New Calendar Subscription** → paste the link → set refresh to every hour.
